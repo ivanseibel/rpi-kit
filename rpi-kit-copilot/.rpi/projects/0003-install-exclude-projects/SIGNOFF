@@ -1,0 +1,22 @@
+# SIGNOFF — 0003-install-exclude-projects
+
+Implementation complete for `.rpi/projects/0003-install-exclude-projects/plan.md`.
+
+Date: 2026-02-12
+Role: Implementer
+
+## Scope Completed
+
+- Excluded `.rpi/projects/**` from installer copy output.
+- Ensured dependency-discovered paths under `.rpi/projects/**` are not installed.
+- Prevented template targets under `.rpi/projects/**` from being written.
+- Updated documentation and inventory to state `.rpi/projects/` is local-only and excluded from installation.
+- Verified end-to-end install behavior against a fresh target directory.
+
+## Verification Evidence
+
+- Task 1: `node install.js --dry-run --target "$(mktemp -d)"` contains completion marker and no `.rpi/projects/` paths (`NO_FORBIDDEN_PATHS`).
+- Task 2: Temporary scanned markdown link to `.rpi/projects/0001-rpikit/research.md` still yields no `.rpi/projects/` dry-run output (`NO_FORBIDDEN_PATHS`); temporary file removed.
+- Task 3: Temporary template targeting `.rpi/projects/should-not-exist.md` does not write target file on install (`TEMPLATE_GUARD_PASSED`); temporary template removed.
+- Task 4: Inventory and docs wording updated (`INVENTORY_EXCLUSION_DOC_OK`, `README_EXCLUSION_DOC_OK`).
+- Task 5: `./install.sh --target "$(mktemp -d)"` results in no target `.rpi/projects` directory and expected `.rpi` artifacts (`E2E_LAYOUT_OK`).

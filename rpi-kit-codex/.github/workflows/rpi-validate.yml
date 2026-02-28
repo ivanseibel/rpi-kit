@@ -1,0 +1,202 @@
+name: Validate RPI Artifacts
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  validate-rpi-artifacts:
+    name: Validate RPI Workflow Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate governance files
+        run: |
+          echo "Checking .rpi/AGENTS.md governance..."
+          test -f .rpi/AGENTS.md || { echo "❌ Missing .rpi/AGENTS.md"; exit 1; }
+
+          # Check for required table with role names
+          grep -q "Researcher" .rpi/AGENTS.md || { echo "❌ Missing Researcher role"; exit 1; }
+          grep -q "Planner" .rpi/AGENTS.md || { echo "❌ Missing Planner role"; exit 1; }
+          grep -q "Implementer" .rpi/AGENTS.md || { echo "❌ Missing Implementer role"; exit 1; }
+          echo "✅ Governance file valid"
+
+      - name: Validate Codex skills (.agents/skills)
+        run: |
+          echo "Checking Codex skill directories..."
+          test -d .agents/skills || { echo "❌ Missing .agents/skills"; exit 1; }
+
+          # Validate each discovered skill has a SKILL.md with required frontmatter.
+          SKILL_COUNT=0
+          for SKILL_DIR in .agents/skills/*; do
+            if [ -d "$SKILL_DIR" ]; then
+              SKILL_COUNT=$((SKILL_COUNT + 1))
+              test -f "$SKILL_DIR/SKILL.md" || { echo "❌ Missing SKILL.md in $SKILL_DIR"; exit 1; }
+              grep -q "^---" "$SKILL_DIR/SKILL.md" || { echo "❌ Missing frontmatter delimiter in $SKILL_DIR/SKILL.md"; exit 1; }
+              grep -q "^name: " "$SKILL_DIR/SKILL.md" || { echo "❌ Missing name field in $SKILL_DIR/SKILL.md"; exit 1; }
+              grep -q "^description: " "$SKILL_DIR/SKILL.md" || { echo "❌ Missing description field in $SKILL_DIR/SKILL.md"; exit 1; }
+
+              SKILL_NAME=$(grep "^name: " "$SKILL_DIR/SKILL.md" | head -n 1 | sed 's/^name: //')
+              if ! echo "$SKILL_NAME" | grep -qE "^[a-z0-9-]+$"; then
+                echo "❌ Skill name must match ^[a-z0-9-]+$ regex (got: $SKILL_NAME)"
+                exit 1
+              fi
+            fi
+          done
+
+          if [ "$SKILL_COUNT" -lt 1 ]; then
+            echo "❌ No skills found under .agents/skills"
+            exit 1
+          fi
+
+          # Enforce presence of the RPI workflow helper skill.
+          test -d .agents/skills/rpi-workflow || { echo "❌ Missing .agents/skills/rpi-workflow"; exit 1; }
+          test -f .agents/skills/rpi-workflow/resources/plan-template.md || { echo "❌ Missing plan-template.md"; exit 1; }
+          test -f .agents/skills/rpi-workflow/resources/prompts/plan-example.md || { echo "❌ Missing plan-example.md"; exit 1; }
+          test -f .agents/skills/rpi-workflow/resources/validation/README.md || { echo "❌ Missing validation README.md"; exit 1; }
+
+          echo "✅ Skills valid"
+
+      - name: Validate removed VS Code/Copilot artifacts
+        run: |
+          echo "Checking removed VS Code/Copilot artifacts..."
+          test ! -d .vscode || { echo "❌ .vscode directory should not exist"; exit 1; }
+          test ! -f .github/copilot-instructions.md || { echo "❌ .github/copilot-instructions.md should not exist"; exit 1; }
+          test ! -d .github/instructions || { echo "❌ .github/instructions should not exist"; exit 1; }
+          test ! -d .github/prompts || { echo "❌ .github/prompts should not exist"; exit 1; }
+          test ! -d .github/skills || { echo "❌ .github/skills should not exist"; exit 1; }
+          test ! -f .rpi/scripts/check-vscode-load.sh || { echo "❌ VS Code load-check helper script should not exist"; exit 1; }
+          echo "✅ Removed artifacts absent"
+
+      - name: Validate documentation is Codex-centric
+        run: |
+          echo "Checking documentation..."
+          test -f .rpi/docs/rpi-workflow.md || { echo "❌ Missing rpi-workflow.md"; exit 1; }
+
+          if grep -R -n "VS Code Load Checks" .rpi/docs >/dev/null 2>&1; then
+            echo "❌ Docs still reference VS Code Load Checks"
+            exit 1
+          fi
+          if grep -R -n "\.vscode" .rpi/docs >/dev/null 2>&1; then
+            echo "❌ Docs still reference .vscode"
+            exit 1
+          fi
+          if grep -R -n "\.github/skills" .rpi/docs >/dev/null 2>&1; then
+            echo "❌ Docs still reference .github/skills"
+            exit 1
+          fi
+
+          echo "✅ Docs look Codex-centric"
+
+      - name: Validate handoff checklist
+        run: |
+          echo "Checking handoff checklist..."
+          test -f .rpi/docs/handoff-checklist.md || { echo "❌ Missing handoff-checklist.md"; exit 1; }
+
+          # Check for required checklist items
+          grep -q "research.md validated" .rpi/docs/handoff-checklist.md || { echo "❌ Missing research.md validated item"; exit 1; }
+          grep -q "plan.md present and FACTS affirmed" .rpi/docs/handoff-checklist.md || { echo "❌ Missing plan.md FACTS item"; exit 1; }
+          grep -q ".rpi/AGENTS.md reviewed" .rpi/docs/handoff-checklist.md || { echo "❌ Missing .rpi/AGENTS.md reviewed item"; exit 1; }
+          grep -q "CI validation passing" .rpi/docs/handoff-checklist.md || { echo "❌ Missing CI validation item"; exit 1; }
+          grep -q "SIGNOFF" .rpi/docs/handoff-checklist.md || { echo "❌ Missing SIGNOFF documentation"; exit 1; }
+
+          echo "✅ Handoff checklist valid"
+
+      - name: Validate RPI phase artifacts (if present)
+        run: |
+          echo "Checking for RPI phase artifacts..."
+
+          # Find all .rpi project directories
+          if [ -d .rpi ]; then
+            for PROJECT_DIR in .rpi/projects/*/; do
+              if [ -d "$PROJECT_DIR" ]; then
+                PROJECT_NAME=$(basename "$PROJECT_DIR")
+                echo "Checking project: $PROJECT_NAME"
+                
+                # If research.md exists, validate structure
+                if [ -f "${PROJECT_DIR}research.md" ]; then
+                  echo "  Validating research.md..."
+                  grep -q "Problem Statement" "${PROJECT_DIR}research.md" || echo "  ⚠️  Missing Problem Statement section"
+                  grep -q "FAR" "${PROJECT_DIR}research.md" || echo "  ⚠️  Missing FAR validation"
+                fi
+                
+                # If plan.md exists, validate structure
+                if [ -f "${PROJECT_DIR}plan.md" ]; then
+                  echo "  Validating plan.md..."
+                  grep -q "FACTS" "${PROJECT_DIR}plan.md" || echo "  ⚠️  Missing FACTS validation"
+                  grep -q "Atomic Task List" "${PROJECT_DIR}plan.md" || echo "  ⚠️  Missing Atomic Task List section"
+                fi
+              fi
+            done
+          fi
+
+          echo "✅ Phase artifacts checked"
+
+      - name: Validate RPI project naming
+        run: |
+          echo "Checking .rpi project naming..."
+
+          if [ -d .rpi ]; then
+            LEGACY_ALLOWLIST="email-service rpi-framework-improvements"
+
+            for PROJECT_DIR in .rpi/projects/*/; do
+              if [ -d "$PROJECT_DIR" ]; then
+                PROJECT_NAME=$(basename "$PROJECT_DIR")
+
+                if [ -f "${PROJECT_DIR}research.md" ] || [ -f "${PROJECT_DIR}plan.md" ]; then
+                  if echo "$PROJECT_NAME" | grep -qE "^[0-9]{4}-"; then
+                    continue
+                  fi
+
+                  if echo "$LEGACY_ALLOWLIST" | grep -qw "$PROJECT_NAME"; then
+                    echo "  Legacy project allowed: $PROJECT_NAME"
+                    continue
+                  fi
+
+                  echo "❌ RPI project directory must be prefixed with NNNN- (got: $PROJECT_NAME)"
+                  exit 1
+                fi
+              fi
+            done
+          fi
+
+          echo "✅ .rpi naming valid"
+
+      - name: Check for SIGNOFF on implementation PRs
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Checking for implementation labels and SIGNOFF..."
+
+          # Note: This is a simplified check. In production, you would:
+          # 1. Use GitHub API to check PR labels
+          # 2. Verify SIGNOFF file exists if "implementation" label is present
+          # 3. Ensure all tasks in plan.md are marked complete
+
+          # For now, just check if any SIGNOFF files exist in changed files
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "SIGNOFF"; then
+            echo "✅ SIGNOFF file detected in PR"
+          else
+            echo "ℹ️  No SIGNOFF file in this PR (OK if not implementation phase)"
+          fi
+
+      - name: Summary
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "✅ All RPI workflow artifacts validated!"
+          echo "=========================================="
+          echo ""
+          echo "Validated:"
+          echo "  • Governance files (AGENTS.md)"
+          echo "  • Codex skills (.agents/skills)"
+          echo "  • Removed VS Code/Copilot artifacts"
+          echo "  • Documentation (Codex-centric)"
+          echo "  • Handoff checklist"
+          echo "  • Phase artifacts (if present)"
+          echo ""
+          echo "Repository is RPI-compliant! 🎉"

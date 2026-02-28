@@ -1,0 +1,11 @@
+Project: 0002-fix-custom-prompts
+Date: 2026-02-11
+
+Plan: .rpi/projects/0002-fix-custom-prompts/plan.md
+
+Completion:
+- All tasks in plan.md marked complete [x]
+- Local verification performed:
+  - ./.rpi/scripts/check-vscode-load.sh
+  - Task-specific grep/test checks in plan.md
+- Manual verification (VS Code): Prompt discovery shows /rpikit.research, /rpikit.plan, /rpikit.implement; legacy /research, /plan, /implement not present

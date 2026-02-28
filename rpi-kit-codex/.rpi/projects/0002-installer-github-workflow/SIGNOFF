@@ -1,0 +1,5 @@
+Implementation sign-off: 0002-installer-github-workflow
+
+- Scope: Completed all tasks in .rpi/projects/0002-installer-github-workflow/plan.md
+- Verification: Installer run into temp targets; workflow installed; kit example projects not installed; non-interactive prompt mode preserves existing workflow; rpi-new.sh creates new project
+- Result: Target repos receive the validation workflow and can scaffold new RPI projects without inheriting kit example projects
