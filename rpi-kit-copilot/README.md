@@ -1,4 +1,9 @@
-# RPI Kit
+# RPI Kit — Copilot Flavor (Legacy)
+
+> **Deprecated.** This per-project installer is superseded by the user-level model.
+> Use [`rpi-kit-user`](../rpi-kit-user/README.md) (once per user) and
+> [`rpi-kit-project`](../rpi-kit-project/README.md) (once per repository) instead.
+> This folder is kept for backward compatibility and will be removed in a future version.
 
 This folder packages the RPI workflow artifacts so they can be copied into another repository.
 
