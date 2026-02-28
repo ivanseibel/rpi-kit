@@ -73,6 +73,19 @@ function vscodeUserDir() {
 }
 
 // ---------------------------------------------------------------------------
+// VS Code profile directories (each named profile gets its own prompts/
+// instructions/ and settings.json that live under {vsCodeUser}/profiles/<id>/)
+// ---------------------------------------------------------------------------
+function vscodeProfileDirs(vsCodeUser) {
+	const profilesRoot = path.join(vsCodeUser, "profiles");
+	if (!fs.existsSync(profilesRoot)) return [];
+	return fs
+		.readdirSync(profilesRoot, { withFileTypes: true })
+		.filter((d) => d.isDirectory())
+		.map((d) => path.join(profilesRoot, d.name));
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 function usage() {
@@ -197,6 +210,7 @@ async function installSkillsForAgent({ agentId, skillsSrc, mode, dryRun }) {
 // ---------------------------------------------------------------------------
 const VSCODE_SETTINGS_TO_MERGE = {
 	"github.copilot.chat.codeGeneration.useInstructionFiles": true,
+	"chat.promptFiles": true,
 };
 
 /**
@@ -422,27 +436,42 @@ async function main() {
 	console.log("");
 
 	if (!skipVSCode) {
-		// 2. VS Code settings
+		// Collect all dirs to install VS Code artifacts into:
+		// default user dir + each custom profile dir
+		const profileDirs = vscodeProfileDirs(vsCodeUser);
+		const vscodeDirs = [vsCodeUser, ...profileDirs];
+
+		// 2. VS Code settings (default dir + each profile)
 		console.log("── VS Code settings ─────────────────────────────────");
-		const settingsPath = path.join(vsCodeUser, "settings.json");
-		await mergeVSCodeSettings({ settingsPath, dryRun });
+		for (const dir of vscodeDirs) {
+			const settingsPath = path.join(dir, "settings.json");
+			// Only merge into a profile's settings.json if it already exists
+			// (absent settings.json means the profile inherits defaults)
+			if (dir === vsCodeUser || fs.existsSync(settingsPath)) {
+				await mergeVSCodeSettings({ settingsPath, dryRun });
+			}
+		}
 		console.log("");
 
-		// 3. VS Code user prompts
+		// 3. VS Code user prompts (default dir + each profile)
 		console.log("── VS Code prompts ──────────────────────────────────");
-		const promptsDest = path.join(vsCodeUser, "prompts");
-		await installVSCodePrompts({ promptsSrc, promptsDest, mode, dryRun });
+		for (const dir of vscodeDirs) {
+			const promptsDest = path.join(dir, "prompts");
+			await installVSCodePrompts({ promptsSrc, promptsDest, mode, dryRun });
+		}
 		console.log("");
 
-		// 4. VS Code user instructions
+		// 4. VS Code user instructions (default dir + each profile)
 		console.log("── VS Code instructions ─────────────────────────────");
-		const instructionsDest = path.join(vsCodeUser, "instructions");
-		await installVSCodeInstructions({
-			instructionsSrc,
-			instructionsDest,
-			mode,
-			dryRun,
-		});
+		for (const dir of vscodeDirs) {
+			const instructionsDest = path.join(dir, "instructions");
+			await installVSCodeInstructions({
+				instructionsSrc,
+				instructionsDest,
+				mode,
+				dryRun,
+			});
+		}
 		console.log("");
 	}
 

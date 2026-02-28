@@ -24,6 +24,7 @@ Installed for each configured agent (default: all three).
 | `research.instructions.md`    | `rpi-kit-copilot/.github/instructions/` | `{vscode-user}/instructions/`             |
 | `plan.instructions.md`        | `rpi-kit-copilot/.github/instructions/` | `{vscode-user}/instructions/`             |
 | `useInstructionFiles` setting | —                                       | Merged into `{vscode-user}/settings.json` |
+| `chat.promptFiles` setting    | —                                       | Merged into `{vscode-user}/settings.json` |
 
 ## Kit-Only (not installed)
 

@@ -4,24 +4,21 @@ RPI Kit — Research → Plan → Implement
 A toolkit that adds a disciplined Research → Plan → Implement (RPI) workflow
 to any project, across multiple AI agents.
 
-## Quick start (recommended — user-level model)
+## Quick start
 
 Skills and VS Code configuration are installed **once per user**, not per project.
-Any project can then use them with a two-command setup.
+From then on, any project is ready to use RPI — no per-project setup required.
 
 ```bash
-# Step 1 — install skills and VS Code config (run once, globally)
+# Install skills and VS Code config (run once, globally)
 node rpi-kit-user/install.js
-
-# Step 2 — bootstrap a project (run in any target repository)
-node rpi-kit-project/install.js --target /path/to/your-project
-
-# … or with GitHub Copilot artifacts:
-node rpi-kit-project/install.js --target /path/to/your-project --copilot
 ```
 
-See [rpi-kit-user/README.md](rpi-kit-user/README.md) and
-[rpi-kit-project/README.md](rpi-kit-project/README.md) for full options.
+See [rpi-kit-user/README.md](rpi-kit-user/README.md) for full options.
+
+> **`.rpi/` bootstrap:** the `rpi-workflow` skill automatically creates `.rpi/AGENTS.md`
+> and `.rpi/projects/` in any repository the first time it is invoked, using its
+> bundled [governance template](skills/rpi-workflow/resources/agents-md-template.md).
 
 ## What the user installer provides
 
@@ -32,17 +29,9 @@ See [rpi-kit-user/README.md](rpi-kit-user/README.md) and
 | `skill-manager` skill                 | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
 | `github-mcp-issues` skill             | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
 | VS Code setting `useInstructionFiles` | merged into user `settings.json` | —                   | —                   |
+| VS Code setting `chat.promptFiles`    | merged into user `settings.json` | —                   | —                   |
 | `/rpikit.*` prompts                   | VS Code user `prompts/`          | —                   | —                   |
 | RPI phase instructions                | VS Code user `instructions/`     | —                   | —                   |
-
-## What the project installer provides
-
-| Artifact                          | Purpose                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `.rpi/AGENTS.md`                  | Governance: roles, handoff rules, recursion protocol (also auto-bootstrapped by the skill) |
-| `.rpi/projects/.gitkeep`          | Initialises the phase-artifacts directory (also auto-bootstrapped by the skill)            |
-| `.github/copilot-instructions.md` | RPI constitution for Copilot (`--copilot`)                                                 |
-| `.vscode/settings.json`           | Enables instruction files in VS Code (`--copilot`, only if absent)                         |
 
 ## Canonical skills source
 
@@ -53,9 +42,8 @@ Both the user installer and the legacy per-project installers read from there
 ## Key files
 
 - [rpi-kit-user/INVENTORY.md](rpi-kit-user/INVENTORY.md) — full list of user-level destinations
-- [rpi-kit-project/INVENTORY.md](rpi-kit-project/INVENTORY.md) — full list of per-project artifacts
 - [skills/rpi-workflow/SKILL.md](skills/rpi-workflow/SKILL.md) — RPI workflow skill
-- [rpi-kit-project/.rpi/AGENTS.md](rpi-kit-project/.rpi/AGENTS.md) — governance template
+- [skills/rpi-workflow/resources/agents-md-template.md](skills/rpi-workflow/resources/agents-md-template.md) — governance template (auto-deployed by the skill)
 
 ## Legacy per-project installers (deprecated)
 
@@ -67,8 +55,7 @@ Both the user installer and the legacy per-project installers read from there
 - **`rpi-kit-codex/`** — Codex/AGENTS.md flavor (installs `.agents/`, `.rpi/` per repo).
   See [rpi-kit-codex/README.md](rpi-kit-codex/README.md).
 
-Migration: run the user installer once, then the project installer in each existing
-repository. You can remove the legacy per-project skill directories afterwards.
+Migration: run the user installer once. You can remove the legacy per-project skill directories afterwards. The `rpi-workflow` skill will recreate `.rpi/AGENTS.md` automatically the first time it is invoked in each repository.
 
 ## Contributing
 
