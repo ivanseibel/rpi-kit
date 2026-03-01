@@ -47,9 +47,9 @@ bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 
 ## What Gets Installed
 
-| Skill               | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `rpi-workflow`      | Research → Plan → Implement workflow with stages, templates, and validation |
+| Skill          | Description                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| `rpi-workflow` | Research → Plan → Implement workflow with stages, templates, and validation |
 
 All skills are installed to `~/.agents/skills/<skill-name>/`.
 
