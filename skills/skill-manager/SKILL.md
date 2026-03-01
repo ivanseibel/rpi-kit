@@ -13,7 +13,7 @@ Use this skill when creating a new Agent Skill or editing an existing one so the
 
 1. Choose a specific, action-oriented skill directory name and set the same value in the frontmatter name field.
 2. Draft a specific description that states what the skill does and when to use it.
-3. Create the skill folder under your agent's user-level skills directory (`~/.copilot/skills/`, `~/.agents/skills/`, or `~/.claude/skills/`) for personal use across all projects, or under `.github/skills/` / `.agents/skills/` for project-scoped use.
+3. Create the skill folder under `~/.agents/skills/` for personal use across all projects, or under `.agents/skills/` in the repository root for project-scoped use.
 4. Add SKILL.md with clear sections for when-to-use, steps, examples, and edge cases.
 5. Move heavy content into references/ or assets/ and link them from SKILL.md.
 6. Keep SKILL.md under 500 lines and avoid deep reference chains.

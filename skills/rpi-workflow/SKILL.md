@@ -1,137 +1,54 @@
 ---
 name: rpi-workflow
-description: Assist with Research → Plan → Implement workflow by providing templates, validation guidance, and phase transition helpers for systematic software development.
+description: Deterministic Research → Plan → Implement workflow for systematic software development. Tool-agnostic — works with any AI agent.
 ---
 
-# RPI Workflow Skill
+# RPI Workflow
 
-This skill helps agents and operators navigate the Research → Plan → Implement (RPI) pattern for systematic software development.
+A deterministic three-phase workflow: **Research → Plan → Implement**. Each phase produces exactly one artifact. Phases are never skipped.
 
-## Usage
+## Routing — Load Only the Current Stage
 
-Invoke this skill when:
+Identify which phase the operator is requesting, then read **only** the corresponding file:
 
-- **Starting a new RPI project** - Need templates and structure for research/plan artifacts.
-- **Transitioning between phases** - Ensuring proper handoff criteria are met.
-- **Validating artifacts** - Checking research.md against FAR criteria or plan.md against FACTS criteria.
-- **Understanding phase constraints** - Learning what's allowed/forbidden in each phase.
+| Phase | Read this file | Artifact produced |
+|-------|---------------|-------------------|
+| Research | `stages/research.md` | `.rpi/projects/<id>/research.md` |
+| Plan | `stages/plan.md` | `.rpi/projects/<id>/plan.md` |
+| Implement | `stages/implement.md` | source code + `SIGNOFF` |
 
-### Pre-flight Bootstrap
+> **Token discipline:** Do NOT read stages you are not actively executing. Each stage file is self-contained with its own rules, constraints, and validation criteria.
 
-Before doing any phase work, verify that the repository is properly set up:
+## Bootstrap
 
-1. **Check for `.rpi/AGENTS.md`** — if the file is absent, create it by copying the content of `resources/agents-md-template.md` (relative to this skill) verbatim to `.rpi/AGENTS.md` in the repository root.
-2. **Check for `.rpi/projects/`** — if the directory is absent, create `.rpi/projects/.gitkeep` so the directory is version-controlled.
-3. Report to the operator what was bootstrapped (e.g., "Created `.rpi/AGENTS.md` from template."). If both files already exist, continue silently.
+Before any phase work, ensure the repository has RPI governance:
 
-> **Scope constraint:** these bootstrap writes (`.rpi/AGENTS.md` and `.rpi/projects/.gitkeep`) are the only files the skill may create outside the normal phase rules. No other files may be created during bootstrap.
+1. If `.rpi/AGENTS.md` is absent → create it from `resources/agents-md-template.md`.
+2. If `.rpi/projects/` is absent → create `.rpi/projects/.gitkeep`.
+3. Report what was created. If both exist, continue silently.
 
-### Phase-Specific Guidance
+These are the only files the skill may create outside normal phase rules.
 
-**Research Phase:**
-- Produce `.rpi/projects/<project-id>/research.md` following the template.
-- Maintain read-only posture—no solution proposals.
-- Cite all sources inline (e.g., `source.md — Section 2`).
-- Validate against FAR: Factual, Actionable, Relevant.
-- **You MUST NOT create or modify any file other than `research.md`. Producing any additional artifact—markdown, draft, note, checklist, or implementation file—is a critical phase violation. Stop immediately and report to the operator.**
+## Macro Rules
 
-**Plan Phase:**
-- Produce `.rpi/projects/<project-id>/plan.md` following the template.
-- Reference facts from `research.md`—no unsupported assumptions.
-- Decompose into atomic tasks with pass/fail verification.
-- Validate against FACTS: Feasible, Atomic, Clear, Testable, Scoped.
-- **You MUST NOT create or modify any file other than `plan.md`. Producing any additional artifact is a critical phase violation. Stop immediately and report to the operator.**
+- **No phase skipping.** Research → Plan → Implement, always in order.
+- **Single artifact per phase.** Research produces only `research.md`; Plan produces only `plan.md`.
+- **Recurse on blockers.** If a phase hits an unresolvable issue, stop and return to the prior phase.
+- **Never reuse project folders silently.** Scan `.rpi/projects/` for existing slugs; if found, stop and ask the operator before proceeding.
 
-**Implement Phase:**
-- Execute tasks from `plan.md` sequentially.
-- Mark tasks complete only after verification passes.
-- Halt and recurse to Plan if task is impossible.
-- Create `.rpi/projects/<project-id>/SIGNOFF` when all tasks complete.
+## Scaffolding Script
 
-## Scripts
+Create a new project directory:
 
-### RPI Project Scaffolder
-
-Location: `<skills-dir>/rpi-workflow/scripts/rpi-new.sh`
-
-Where `<skills-dir>` is the skills directory your agent reads from:
-- GitHub Copilot: `~/.copilot/skills/`
-- OpenAI Codex: `~/.agents/skills/`
-- Claude: `~/.claude/skills/`
-
-Creates a new RPI project directory structure with a date prefix (yyyymmdd).
-
-**Usage:**
 ```bash
-# GitHub Copilot
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-
-# OpenAI Codex
 bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-
-# Claude
-bash ~/.claude/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 ```
 
-**What it does:**
-- Validates `.rpi/` directory exists in repository root
-- Calculates a date prefix (e.g., `20260213`)
-- Creates `.rpi/projects/yyyymmdd-project-slug/research.md` with standard template
-- Generates URL-friendly slug from project title
-
-**Dependencies:**
-- Bash shell (standard on macOS/Linux)
-- No Node.js or package manager dependencies
-
-**Example:**
-```bash
-# Creates .rpi/projects/20260213-authentication-refactor/research.md
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Authentication Refactor"
-# or: bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Authentication Refactor"
-# or: bash ~/.claude/skills/rpi-workflow/scripts/rpi-new.sh "Authentication Refactor"
-```
-
-## Project Reuse Policy
-
-> **Every session starts with a new project folder.** Never reuse an existing `.rpi/projects/` folder unless the operator explicitly authorizes it.
-
-### Rules
-
-1. **Pre-flight scan:** Before writing any artifact, list `.rpi/projects/` and check for folders with a similar slug.
-2. **Match found — stop and report:** If a potentially related folder is found, report:
-   - Folder name and date prefix
-   - Which artifacts exist (`research.md`, `plan.md`, `SIGNOFF`)
-   - Whether the project is finalized (has `SIGNOFF`)
-   Then **stop and wait** for operator instruction.
-3. **Reuse requires explicit authorization:** The operator must say `reuse project <project-id>` or `continue project <project-id>`. Vague similarity is never enough.
-4. **Fresh start:** If the operator wants a new session on the same topic, direct them to run the scaffolder to create a new dated folder. Do not write to the old folder.
-5. **Never overwrite silently:** Even when reuse is authorized, do not overwrite an artifact without stating which file will be modified and receiving confirmation.
-
-### When Reuse Is Authorized
-
-If the operator explicitly says to reuse a project:
-- Confirm which artifacts may be modified (e.g., "updating `plan.md` only").
-- Read the existing artifacts first before writing.
-- Preserve any content the operator has not asked to change.
+Creates `.rpi/projects/yyyymmdd-slug/research.md` from the research template.
 
 ## Resources
 
-- [AGENTS.md Template](resources/agents-md-template.md) - Governance template written to `.rpi/AGENTS.md` when the file is absent.
-- [Research Template](resources/research-template.md) - Boilerplate structure for research.md files.
-- [Plan Template](resources/plan-template.md) - Boilerplate structure for plan.md files.
-- [Prompt Examples](resources/prompts/plan-example.md) - Sample prompts for phase transitions.
-- [Validation Guide](resources/validation/README.md) - How to check FAR and FACTS criteria.
-
-## Technical Notes
-
-This skill works with instructions from various agents:
-
-**GitHub Copilot (VS Code):**
-- **Global instructions:** `.github/copilot-instructions.md` (RPI constitution)
-- **Scoped instructions:** `.github/instructions/*.instructions.md` (phase-specific constraints)
-- **Prompt entry points:** `.github/prompts/*.prompt.md` (operator UX helpers)
-
-**OpenAI Codex / Claude / other agents:**
-- **Governance:** `.rpi/AGENTS.md` (role definitions, handoff rules, recursion protocol)
-
-All RPI project artifacts (`.rpi/projects/`) are repository-backed and validated by CI (`.github/workflows/rpi-validate.yml`).
+- [AGENTS.md Template](resources/agents-md-template.md) — Governance for `.rpi/AGENTS.md`
+- [Research Template](resources/research-template.md) — Structure for `research.md`
+- [Plan Template](resources/plan-template.md) — Structure for `plan.md`
+- [Validation Guide](resources/validation-guide.md) — FAR and FACTS criteria reference

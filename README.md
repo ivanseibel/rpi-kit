@@ -1,63 +1,100 @@
 RPI Kit — Research → Plan → Implement
 ====================================
 
-A toolkit that adds a disciplined Research → Plan → Implement (RPI) workflow
-to any project, across multiple AI agents.
+A tool-agnostic toolkit that adds a deterministic **Research → Plan → Implement (RPI)** workflow to any project. Works with any AI agent: Copilot, Claude, Gemini, Cursor, Codex, or others.
 
-## Quick start
-
-Skills and VS Code configuration are installed **once per user**, not per project.
-From then on, any project is ready to use RPI — no per-project setup required.
+## Quick Start
 
 ```bash
-# Install skills and VS Code config (run once, globally)
-node rpi-kit-user/install.js
+# Install skills globally (run once)
+bash install.sh
+
+# Or with Node directly
+node install.js
 ```
 
-See [rpi-kit-user/README.md](rpi-kit-user/README.md) for full options.
+Skills are installed to `~/.agents/skills/`. This is the single canonical path used by all agents.
 
-> **`.rpi/` bootstrap:** the `rpi-workflow` skill automatically creates `.rpi/AGENTS.md`
-> and `.rpi/projects/` in any repository the first time it is invoked, using its
-> bundled [governance template](skills/rpi-workflow/resources/agents-md-template.md).
+> **For agents that use a different skills path** (e.g. `~/.copilot/skills/`), either configure the agent to read from `~/.agents/skills/` or create a symlink:
+> ```bash
+> ln -s ~/.agents/skills ~/.copilot/skills
+> ```
 
-## What the user installer provides
+## How It Works
 
-| Artifact                              | Copilot                          | Codex               | Claude              |
-| ------------------------------------- | -------------------------------- | ------------------- | ------------------- |
-| `rpi-workflow` skill                  | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
-| `e2e-testing` skill                   | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
-| `skill-manager` skill                 | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
-| `github-mcp-issues` skill             | `~/.copilot/skills/`             | `~/.agents/skills/` | `~/.claude/skills/` |
-| VS Code setting `useInstructionFiles` | merged into user `settings.json` | —                   | —                   |
-| VS Code setting `chat.promptFiles`    | merged into user `settings.json` | —                   | —                   |
-| `/rpikit.*` prompts                   | VS Code user `prompts/`          | —                   | —                   |
-| RPI phase instructions                | VS Code user `instructions/`     | —                   | —                   |
+The `rpi-workflow` skill enforces a three-phase workflow:
 
-## Canonical skills source
+| Phase         | Artifact                | Validation                                        |
+| ------------- | ----------------------- | ------------------------------------------------- |
+| **Research**  | `research.md`           | FAR (Factual, Actionable, Relevant)               |
+| **Plan**      | `plan.md`               | FACTS (Feasible, Atomic, Clear, Testable, Scoped) |
+| **Implement** | source code + `SIGNOFF` | Pass/fail per task                                |
 
-All skills live in [`skills/`](skills/) at the root of this kit.
-Both the user installer and the legacy per-project installers read from there
-(the legacy installers still read from their own copies for backward compat).
+Each phase is self-contained. The agent loads **only** the instructions for the current phase, minimizing token consumption.
 
-## Key files
+### Bootstrap
 
-- [rpi-kit-user/INVENTORY.md](rpi-kit-user/INVENTORY.md) — full list of user-level destinations
-- [skills/rpi-workflow/SKILL.md](skills/rpi-workflow/SKILL.md) — RPI workflow skill
-- [skills/rpi-workflow/resources/agents-md-template.md](skills/rpi-workflow/resources/agents-md-template.md) — governance template (auto-deployed by the skill)
+The first time the skill is invoked in a repository, it automatically creates:
+- `.rpi/AGENTS.md` — governance roles and handoff rules
+- `.rpi/projects/.gitkeep` — project artifacts directory
 
-## Legacy per-project installers (deprecated)
+### New Project
 
-> The flavors below still work but are superseded by the user-level model above.
-> They will be removed in a future version.
+```bash
+bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
+# Creates .rpi/projects/yyyymmdd-slug/research.md
+```
 
-- **`rpi-kit-copilot/`** — GitHub Copilot flavor (installs `.github/`, `.vscode/`, `.rpi/` per repo).
-  See [rpi-kit-copilot/README.md](rpi-kit-copilot/README.md).
-- **`rpi-kit-codex/`** — Codex/AGENTS.md flavor (installs `.agents/`, `.rpi/` per repo).
-  See [rpi-kit-codex/README.md](rpi-kit-codex/README.md).
+## What Gets Installed
 
-Migration: run the user installer once. You can remove the legacy per-project skill directories afterwards. The `rpi-workflow` skill will recreate `.rpi/AGENTS.md` automatically the first time it is invoked in each repository.
+| Skill               | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `rpi-workflow`      | Research → Plan → Implement workflow with stages, templates, and validation |
+| `e2e-testing`       | E2E testing patterns with Playwright                                        |
+| `skill-manager`     | Create and edit Agent Skills                                                |
+| `github-mcp-issues` | GitHub Issues management via MCP                                            |
+
+All skills are installed to `~/.agents/skills/<skill-name>/`.
+
+## Installer Options
+
+```
+node install.js [options]
+
+  --target <path>   Override destination (default: ~/.agents/skills)
+  --mode <mode>     Conflict resolution: skip | overwrite | prompt (default: skip)
+  --dry-run         Print actions without writing files
+  -h, --help        Show help
+```
+
+## Project Structure
+
+```
+rpi-kit/
+├── install.js              # Unified installer
+├── install.sh              # Shell wrapper
+├── skills/
+│   ├── rpi-workflow/
+│   │   ├── SKILL.md        # Routing hub — loads one stage at a time
+│   │   ├── stages/         # Phase-specific instructions
+│   │   │   ├── research.md
+│   │   │   ├── plan.md
+│   │   │   └── implement.md
+│   │   ├── resources/      # Templates and validation
+│   │   └── scripts/        # rpi-new.sh scaffolder
+│   ├── e2e-testing/
+│   ├── github-mcp-issues/
+│   └── skill-manager/
+```
+
+## Key Files
+
+- [skills/rpi-workflow/SKILL.md](skills/rpi-workflow/SKILL.md) — skill entry point (lightweight router)
+- [skills/rpi-workflow/stages/](skills/rpi-workflow/stages/) — phase instructions (loaded one at a time)
+- [skills/rpi-workflow/resources/agents-md-template.md](skills/rpi-workflow/resources/agents-md-template.md) — governance template
+- [INVENTORY.md](INVENTORY.md) — full list of installed artifacts
 
 ## Contributing
 
-See each module's `AGENTS.md` for kit-maintenance governance rules.
+See [AGENTS.md](AGENTS.md) for kit-maintenance governance rules.
 

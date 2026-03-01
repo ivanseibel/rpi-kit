@@ -21,7 +21,7 @@ Esta skill orienta a criação de testes end-to-end (E2E) para o projeto Aereo. 
 
 ## 📦 Resources Disponíveis
 
-Esta skill inclui recursos em `<skills-dir>/e2e-testing/resources/` (onde `<skills-dir>` é o diretório de skills do seu agente — ex.: `~/.copilot/skills/`, `~/.agents/skills/`, ou `~/.claude/skills/`):
+Esta skill inclui recursos em `~/.agents/skills/e2e-testing/resources/`:
 
 | Arquivo | Descrição |
 |---------|-----------|

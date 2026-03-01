@@ -1,5 +1,0 @@
-Implementation sign-off: 0001-codex-migration
-
-- Scope: Completed all tasks in .rpi/projects/0001-codex-migration/plan.md
-- Verification: install.js dry-run into a scratch directory; governance files verified identical; docs updated to be Codex-centric
-- Result: Codex-centric layout with skills under .agents/skills and no VS Code-specific artifacts required

@@ -1,21 +1,19 @@
 # Agent Governance: RPI Workflow
 
-This file defines the roles, responsibilities, and constraints for agents
+This file defines the roles, responsibilities, and constraints for AI agents
 operating within the RPI (Research → Plan → Implement) workflow.
 
 ## Skills
 
 Shared skills are installed at **user level** — no per-project copy needed.
 
-| Agent          | Skills directory     |
-| -------------- | -------------------- |
-| GitHub Copilot | `~/.copilot/skills/` |
-| OpenAI Codex   | `~/.agents/skills/`  |
-| Claude         | `~/.claude/skills/`  |
+| Location         | Path                |
+| ---------------- | ------------------- |
+| Skills directory | `~/.agents/skills/` |
 
 Key skills: `rpi-workflow`, `e2e-testing`, `skill-manager`, `github-mcp-issues`.
 
-Run `node rpi-kit-user/install.js` from the kit to install or update skills.
+Run `bash install.sh` from the rpi-kit to install or update skills.
 
 ## Agent Roles and Responsibilities
 

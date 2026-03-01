@@ -7,7 +7,7 @@ set -euo pipefail
 title="${*}"
 
 if [[ -z "$title" ]]; then
-  echo 'Usage: bash .github/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"' >&2
+  echo 'Usage: bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"' >&2
   exit 1
 fi
 
