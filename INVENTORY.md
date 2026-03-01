@@ -20,9 +20,6 @@ Override: `--target <path>`
 | `skills/rpi-workflow/resources/agents-md-template.md` | `~/.agents/skills/rpi-workflow/resources/agents-md-template.md` |
 | `skills/rpi-workflow/resources/validation-guide.md`   | `~/.agents/skills/rpi-workflow/resources/validation-guide.md`   |
 | `skills/rpi-workflow/scripts/rpi-new.sh`              | `~/.agents/skills/rpi-workflow/scripts/rpi-new.sh`              |
-| `skills/e2e-testing/**`                               | `~/.agents/skills/e2e-testing/**`                               |
-| `skills/github-mcp-issues/**`                         | `~/.agents/skills/github-mcp-issues/**`                         |
-| `skills/skill-manager/**`                             | `~/.agents/skills/skill-manager/**`                             |
 
 ## Per-Project Artifacts (created at runtime by the skill)
 

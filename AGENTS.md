@@ -25,9 +25,6 @@ Agents working in this repository are maintaining the RPI toolkit — editing sk
 | `skills/rpi-workflow/stages/*`    | Maintainer | Phase instructions           |
 | `skills/rpi-workflow/resources/*` | Maintainer | Templates and validation     |
 | `skills/rpi-workflow/scripts/*`   | Maintainer | Scaffolding tools            |
-| `skills/e2e-testing/**`           | Maintainer | Unchanged in this refactor   |
-| `skills/github-mcp-issues/**`     | Maintainer | Unchanged in this refactor   |
-| `skills/skill-manager/**`         | Maintainer | Unchanged in this refactor   |
 | `README.md`                       | Maintainer | Kit documentation            |
 | `INVENTORY.md`                    | Maintainer | Must mirror installer output |
 | `AGENTS.md`                       | Maintainer | This file                    |

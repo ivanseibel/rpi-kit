@@ -11,7 +11,7 @@ Shared skills are installed at **user level** — no per-project copy needed.
 | ---------------- | ------------------- |
 | Skills directory | `~/.agents/skills/` |
 
-Key skills: `rpi-workflow`, `e2e-testing`, `skill-manager`, `github-mcp-issues`.
+Key skills: `rpi-workflow`.
 
 Run `bash install.sh` from the rpi-kit to install or update skills.
 

@@ -50,9 +50,6 @@ bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 | Skill               | Description                                                                 |
 | ------------------- | --------------------------------------------------------------------------- |
 | `rpi-workflow`      | Research → Plan → Implement workflow with stages, templates, and validation |
-| `e2e-testing`       | E2E testing patterns with Playwright                                        |
-| `skill-manager`     | Create and edit Agent Skills                                                |
-| `github-mcp-issues` | GitHub Issues management via MCP                                            |
 
 All skills are installed to `~/.agents/skills/<skill-name>/`.
 
@@ -74,17 +71,14 @@ rpi-kit/
 ├── install.js              # Unified installer
 ├── install.sh              # Shell wrapper
 ├── skills/
-│   ├── rpi-workflow/
-│   │   ├── SKILL.md        # Routing hub — loads one stage at a time
-│   │   ├── stages/         # Phase-specific instructions
-│   │   │   ├── research.md
-│   │   │   ├── plan.md
-│   │   │   └── implement.md
-│   │   ├── resources/      # Templates and validation
-│   │   └── scripts/        # rpi-new.sh scaffolder
-│   ├── e2e-testing/
-│   ├── github-mcp-issues/
-│   └── skill-manager/
+│   └── rpi-workflow/
+│       ├── SKILL.md        # Routing hub — loads one stage at a time
+│       ├── stages/         # Phase-specific instructions
+│       │   ├── research.md
+│       │   ├── plan.md
+│       │   └── implement.md
+│       ├── resources/      # Templates and validation
+│       └── scripts/        # rpi-new.sh scaffolder
 ```
 
 ## Key Files
