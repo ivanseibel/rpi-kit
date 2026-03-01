@@ -7,9 +7,20 @@ description: Deterministic Research → Plan → Implement workflow for systemat
 
 A deterministic three-phase workflow: **Research → Plan → Implement**. Each phase produces exactly one artifact. Phases are never skipped.
 
+## ⛔ Critical Rule: ONE Phase Per Session
+
+**Each agent session operates in exactly ONE phase.** You must NEVER transition between phases within a single session. When a phase is complete, STOP and inform the operator. The operator decides when to start the next phase.
+
+**Phase collapse** — executing Research + Plan + Implement in one session — is the most severe workflow violation possible.
+
 ## Routing — Load Only the Current Stage
 
-Identify which phase the operator is requesting, then read **only** the corresponding file:
+Follow this algorithm strictly:
+
+1. **Determine which single phase** the operator is requesting (Research, Plan, or Implement).
+2. **Read ONLY the corresponding stage file** from the table below.
+3. **Follow ONLY those instructions.** Do NOT read other stage files.
+4. **When the phase is complete, STOP** and inform the operator. Do NOT proceed to the next phase.
 
 | Phase | Read this file | Artifact produced |
 |-------|---------------|-------------------|
@@ -32,6 +43,7 @@ These are the only files the skill may create outside normal phase rules.
 ## Macro Rules
 
 - **No phase skipping.** Research → Plan → Implement, always in order.
+- **One phase per session.** Never execute multiple phases in a single turn or session. When a phase completes, STOP.
 - **Single artifact per phase.** Research produces only `research.md`; Plan produces only `plan.md`.
 - **Recurse on blockers.** If a phase hits an unresolvable issue, stop and return to the prior phase.
 - **Never reuse project folders silently.** Scan `.rpi/projects/` for existing slugs; if found, stop and ask the operator before proceeding.
@@ -42,6 +54,8 @@ Create a new project directory:
 
 ```bash
 bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
+# or
+bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 ```
 
 Creates `.rpi/projects/yyyymmdd-slug/research.md` from the research template.

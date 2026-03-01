@@ -11,7 +11,7 @@ Agents working in this repository are maintaining the RPI toolkit — editing sk
 1. **INVENTORY.md stays in sync.** Any change that adds, removes, or renames an installed artifact must update `INVENTORY.md` in the same commit.
 2. **Validate with `--dry-run`.** Before committing installer changes, run `node install.js --dry-run` and verify the output matches the expected inventory.
 3. **Skills source of truth.** The canonical source for all skills is `skills/` at the repo root. There are no secondary copies.
-4. **No tool-specific paths.** Do not introduce references to `~/.copilot/`, `~/.claude/`, `.github/skills/`, `.agents/skills/` or any agent-specific directory. The single canonical path is `~/.agents/skills/`.
+4. **Only approved install paths.** The only canonical installation paths are `~/.agents/skills/` (copilot/codex) and `~/.gemini/antigravity/skills/` (antigravity). Do not introduce other tool-specific paths such as `~/.copilot/`, `~/.claude/`, `.github/skills/`, or `.agents/skills/`.
 5. **Stage isolation.** Each stage file (`stages/research.md`, `stages/plan.md`, `stages/implement.md`) must be self-contained. Do not add cross-references between stages.
 6. **SKILL.md is a router.** Keep `SKILL.md` lightweight. Phase-specific instructions belong in `stages/`, not in `SKILL.md`.
 7. **Template stability.** Changes to `resources/research-template.md` or `resources/plan-template.md` affect all downstream projects. Test thoroughly.

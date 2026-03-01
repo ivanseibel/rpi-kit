@@ -2,17 +2,23 @@
 /**
  * rpi-kit — Unified installer
  *
- * Installs all RPI skills to ~/.agents/skills/ (single canonical path).
- * Tool-agnostic: works with Copilot, Claude, Gemini, Cursor, Codex, or any
- * agent that reads from ~/.agents/skills/.
+ * Installs all RPI skills to a user-level skills directory.
+ * Default target: ~/.agents/skills (Copilot/Codex-compatible).
+ * Tool-specific target via --tool:
+ *   - copilot      -> ~/.agents/skills
+ *   - codex        -> ~/.agents/skills
+ *   - antigravity  -> ~/.gemini/antigravity/skills
  *
  * What gets installed:
- *   skills/* → ~/.agents/skills/
+ *   skills/* → <target>
  *
  * Usage:
  *   node install.js [options]
  *
  * Options:
+ *   --tool <name>    Resolve destination by tool:
+ *                    copilot | codex | antigravity
+ *                    Cannot be combined with --target
  *   --target <path>   Override destination directory.
  *                     Default: ~/.agents/skills
  *   --mode <mode>     File conflict resolution: skip | overwrite | prompt
@@ -27,6 +33,14 @@ const path = require("node:path");
 const readline = require("node:readline");
 
 const VALID_MODES = ["skip", "overwrite", "prompt"];
+const VALID_TOOLS = ["copilot", "codex", "antigravity"];
+
+function defaultTargetForTool(tool) {
+	if (tool === "antigravity") {
+		return path.join(os.homedir(), ".gemini", "antigravity", "skills");
+	}
+	return path.join(os.homedir(), ".agents", "skills");
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -34,9 +48,12 @@ const VALID_MODES = ["skip", "overwrite", "prompt"];
 function usage() {
 	console.log(`Usage: install.js [options]
 
-Installs RPI skills to ~/.agents/skills/.
+Installs RPI skills to a user-level skills directory.
 
 Options:
+	--tool <name>    Resolve destination by tool:
+									 copilot | codex | antigravity
+									 Cannot be combined with --target
   --target <path>   Override destination directory.
                     Default: ~/.agents/skills
   --mode <mode>     File conflict resolution: skip | overwrite | prompt
@@ -117,17 +134,34 @@ async function main() {
 	const args = process.argv.slice(2);
 
 	let target = path.join(os.homedir(), ".agents", "skills");
+	let tool = null;
 	let mode = "skip";
 	let dryRun = false;
+	let targetExplicitlySet = false;
 
 	for (let i = 0; i < args.length; i += 1) {
 		const arg = args[i];
+		if (arg === "--tool") {
+			if (!args[i + 1]) {
+				throw new Error("Missing value for --tool");
+			}
+			tool = args[i + 1].toLowerCase();
+			i += 1;
+			continue;
+		}
 		if (arg === "--target") {
+			if (!args[i + 1]) {
+				throw new Error("Missing value for --target");
+			}
 			target = path.resolve(args[i + 1]);
+			targetExplicitlySet = true;
 			i += 1;
 			continue;
 		}
 		if (arg === "--mode") {
+			if (!args[i + 1]) {
+				throw new Error("Missing value for --mode");
+			}
 			mode = args[i + 1];
 			i += 1;
 			continue;
@@ -149,6 +183,20 @@ async function main() {
 		);
 	}
 
+	if (tool && !VALID_TOOLS.includes(tool)) {
+		throw new Error(
+			`Invalid --tool: ${tool}. Valid values: ${VALID_TOOLS.join(", ")}`,
+		);
+	}
+
+	if (tool && targetExplicitlySet) {
+		throw new Error("Do not combine --tool with --target. Choose one.");
+	}
+
+	if (tool) {
+		target = defaultTargetForTool(tool);
+	}
+
 	const kitRoot = __dirname;
 	const skillsSrc = path.join(kitRoot, "skills");
 
@@ -158,6 +206,9 @@ async function main() {
 
 	console.log(`RPI Kit — Installation${dryRun ? " (dry-run)" : ""}`);
 	console.log(`  Source : ${skillsSrc}`);
+	if (tool) {
+		console.log(`  Tool   : ${tool}`);
+	}
 	console.log(`  Target : ${target}`);
 	console.log(`  Mode   : ${mode}`);
 	console.log("");

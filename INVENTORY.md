@@ -5,21 +5,30 @@ Artifacts installed by `node install.js` (or `bash install.sh`).
 ## Destination
 
 Default: `~/.agents/skills/`  
-Override: `--target <path>`
+By tool (`--tool <name>`):
+- `copilot` → `~/.agents/skills/`
+- `codex` → `~/.agents/skills/`
+- `antigravity` → `~/.gemini/antigravity/skills/`
+
+Override: `--target <path>` (cannot be combined with `--tool`)
 
 ## Installed Files
 
-| Source                                                | Destination                                                     |
-| ----------------------------------------------------- | --------------------------------------------------------------- |
-| `skills/rpi-workflow/SKILL.md`                        | `~/.agents/skills/rpi-workflow/SKILL.md`                        |
-| `skills/rpi-workflow/stages/research.md`              | `~/.agents/skills/rpi-workflow/stages/research.md`              |
-| `skills/rpi-workflow/stages/plan.md`                  | `~/.agents/skills/rpi-workflow/stages/plan.md`                  |
-| `skills/rpi-workflow/stages/implement.md`             | `~/.agents/skills/rpi-workflow/stages/implement.md`             |
-| `skills/rpi-workflow/resources/research-template.md`  | `~/.agents/skills/rpi-workflow/resources/research-template.md`  |
-| `skills/rpi-workflow/resources/plan-template.md`      | `~/.agents/skills/rpi-workflow/resources/plan-template.md`      |
-| `skills/rpi-workflow/resources/agents-md-template.md` | `~/.agents/skills/rpi-workflow/resources/agents-md-template.md` |
-| `skills/rpi-workflow/resources/validation-guide.md`   | `~/.agents/skills/rpi-workflow/resources/validation-guide.md`   |
-| `skills/rpi-workflow/scripts/rpi-new.sh`              | `~/.agents/skills/rpi-workflow/scripts/rpi-new.sh`              |
+| Source                                                | Destination                                                  |
+| ----------------------------------------------------- | ------------------------------------------------------------ |
+| `skills/rpi-workflow/SKILL.md`                        | `<skills-root>/rpi-workflow/SKILL.md`                        |
+| `skills/rpi-workflow/stages/research.md`              | `<skills-root>/rpi-workflow/stages/research.md`              |
+| `skills/rpi-workflow/stages/plan.md`                  | `<skills-root>/rpi-workflow/stages/plan.md`                  |
+| `skills/rpi-workflow/stages/implement.md`             | `<skills-root>/rpi-workflow/stages/implement.md`             |
+| `skills/rpi-workflow/resources/research-template.md`  | `<skills-root>/rpi-workflow/resources/research-template.md`  |
+| `skills/rpi-workflow/resources/plan-template.md`      | `<skills-root>/rpi-workflow/resources/plan-template.md`      |
+| `skills/rpi-workflow/resources/agents-md-template.md` | `<skills-root>/rpi-workflow/resources/agents-md-template.md` |
+| `skills/rpi-workflow/resources/validation-guide.md`   | `<skills-root>/rpi-workflow/resources/validation-guide.md`   |
+| `skills/rpi-workflow/scripts/rpi-new.sh`              | `<skills-root>/rpi-workflow/scripts/rpi-new.sh`              |
+
+`<skills-root>` is one of:
+- `~/.agents/skills/` (default, `--tool copilot`, or `--tool codex`)
+- `~/.gemini/antigravity/skills/` (`--tool antigravity`)
 
 ## Per-Project Artifacts (created at runtime by the skill)
 

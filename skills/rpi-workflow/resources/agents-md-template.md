@@ -7,9 +7,11 @@ operating within the RPI (Research → Plan → Implement) workflow.
 
 Shared skills are installed at **user level** — no per-project copy needed.
 
-| Location         | Path                |
-| ---------------- | ------------------- |
-| Skills directory | `~/.agents/skills/` |
+| Tool        | Skills directory                |
+| ----------- | ------------------------------- |
+| copilot     | `~/.agents/skills/`             |
+| codex       | `~/.agents/skills/`             |
+| antigravity | `~/.gemini/antigravity/skills/` |
 
 Key skills: `rpi-workflow`.
 
@@ -43,3 +45,13 @@ If an agent encounters a blocker that cannot be resolved within their phase cons
 2. **Document the blocker** — Create an issue or update the current phase artifact with the specific blocker.
 3. **Recurse to prior phase** — Transition back to Research (for fundamental unknowns) or Plan (for execution impossibilities).
 4. **Do not proceed** — Wait for the prior phase to update before resuming.
+
+## Phase Enforcement
+
+**Each agent session operates in exactly ONE phase.** An agent MUST NOT transition between phases within a single session. Phase transitions require explicit operator authorization.
+
+### Rules
+
+1. **One phase per session.** When Research is complete, the agent stops. A new session is required for Plan. A new session is required for Implement.
+2. **No phase collapse.** Executing Research + Plan in one turn, or Plan + Implement in one turn, is the most severe workflow violation. The agent must STOP after completing the requested phase.
+3. **Operator gates.** Only the operator can authorize the transition to the next phase. The agent must never self-transition.
