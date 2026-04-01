@@ -13,13 +13,13 @@ bash install.sh
 node install.js
 ```
 
-By default, skills are installed to `~/.agents/skills/`.
+By default, skills are installed to `~/.copilot/skills/`.
 
 You can select a tool-specific destination:
 
 | Tool          | Destination                     |
 | ------------- | ------------------------------- |
-| `copilot`     | `~/.agents/skills/`             |
+| `copilot`     | `~/.copilot/skills/`            |
 | `codex`       | `~/.agents/skills/`             |
 | `antigravity` | `~/.gemini/antigravity/skills/` |
 
@@ -52,10 +52,13 @@ The first time the skill is invoked in a repository, it automatically creates:
 ### New Project
 
 ```bash
-bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
+# New projects use the Copilot-planned skills root by default.
+bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 # or
 bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 # Creates .rpi/projects/yyyymmdd-slug/research.md
+
+Project directories follow a `yyyymmdd-slug` naming pattern that `rpi-new.sh` derives from the title by lowercasing it, replacing non-alphanumeric characters with hyphens, collapsing repeated hyphens, and trimming edge hyphenation.
 ```
 
 ## What Gets Installed
@@ -64,7 +67,7 @@ bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title
 | -------------- | --------------------------------------------------------------------------- |
 | `rpi-workflow` | Research → Plan → Implement workflow with stages, templates, and validation |
 
-All skills are installed to `<skills-root>/<skill-name>/`, where `<skills-root>` is resolved by `--tool` (or defaults to `~/.agents/skills/`).
+All skills are installed to `<skills-root>/<skill-name>/`, where `<skills-root>` is resolved by `--tool` (or defaults to `~/.copilot/skills/`).
 
 ## Installer Options
 
@@ -73,7 +76,7 @@ node install.js [options]
 
   --tool <name>    Resolve destination by tool: copilot | codex | antigravity
                    Cannot be combined with --target
-  --target <path>   Override destination (default: ~/.agents/skills)
+  --target <path>   Override destination (default: ~/.copilot/skills)
   --mode <mode>     Conflict resolution: skip | overwrite | prompt (default: skip)
   --dry-run         Print actions without writing files
   -h, --help        Show help

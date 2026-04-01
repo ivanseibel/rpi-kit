@@ -30,6 +30,10 @@ Follow this algorithm strictly:
 
 > **Token discipline:** Do NOT read stages you are not actively executing. Each stage file is self-contained with its own rules, constraints, and validation criteria.
 
+## Installation
+
+Run `bash install.sh` or `node install.js` to install the skills. Without `--tool` or `--target`, the installer writes into `~/.copilot/skills/`, matching the operator-requested Copilot root. `--tool copilot` behaves the same as the zero-argument default, while `--tool codex` and `--tool antigravity` resolve to `~/.agents/skills/` and `~/.gemini/antigravity/skills/`, respectively. Use `--target <path>` to override the computed destination for custom paths, but do not combine `--target` with `--tool`.
+
 ## Bootstrap
 
 Before any phase work, ensure the repository has RPI governance:
@@ -53,12 +57,15 @@ These are the only files the skill may create outside normal phase rules.
 Create a new project directory:
 
 ```bash
-bash ~/.agents/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
+# New projects reference the Copilot skills root by default.
+bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 # or
 bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
 ```
 
 Creates `.rpi/projects/yyyymmdd-slug/research.md` from the research template.
+
+Project directories follow the `yyyymmdd-slug` pattern that the scaffolder builds from the title: it lowercases characters, replaces non-alphanumeric characters with hyphens, collapses repeated hyphen runs, and trims leading/trailing hyphenation.
 
 ## Resources
 

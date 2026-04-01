@@ -3,7 +3,7 @@
  * rpi-kit — Unified installer
  *
  * Installs all RPI skills to a user-level skills directory.
- * Default target: ~/.agents/skills (Codex-compatible).
+ * Default target: ~/.copilot/skills (Copilot-compatible).
  * Tool-specific target via --tool:
  *   - copilot      -> ~/.copilot/skills
  *   - codex        -> ~/.agents/skills
@@ -20,7 +20,7 @@
  *                    copilot | codex | antigravity
  *                    Cannot be combined with --target
  *   --target <path>   Override destination directory.
- *                     Default: ~/.agents/skills
+ *                     Default: ~/.copilot/skills
  *   --mode <mode>     File conflict resolution: skip | overwrite | prompt
  *                     Default: skip
  *   --dry-run         Print planned actions without writing files.
@@ -54,15 +54,15 @@ function usage() {
 Installs RPI skills to a user-level skills directory.
 
 Options:
-	--tool <name>    Resolve destination by tool:
-									 copilot | codex | antigravity
-									 Cannot be combined with --target
-  --target <path>   Override destination directory.
-                    Default: ~/.agents/skills
-  --mode <mode>     File conflict resolution: skip | overwrite | prompt
-                    Default: skip
-  --dry-run         Print planned actions without writing files.
-  -h, --help        Show this message.
+  --tool <name>    Resolve destination by tool:
+                   copilot | codex | antigravity
+                   Cannot be combined with --target
+  --target <path>  Override destination directory.
+                   Default: ~/.copilot/skills
+  --mode <mode>    File conflict resolution: skip | overwrite | prompt
+                   Default: skip
+  --dry-run        Print planned actions without writing files.
+  -h, --help       Show this message.
 `);
 }
 
@@ -136,7 +136,7 @@ async function copyFileWithMode({ src, dest, mode, dryRun, label }) {
 async function main() {
 	const args = process.argv.slice(2);
 
-	let target = path.join(os.homedir(), ".agents", "skills");
+	let target = path.join(os.homedir(), ".copilot", "skills");
 	let tool = null;
 	let mode = "skip";
 	let dryRun = false;

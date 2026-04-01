@@ -1,0 +1,15 @@
+# SIGNOFF — 20260401-rpi-kit-maintenance
+
+## Completed Tasks
+- [x] Task 1 — Define install destination policy baseline: Added a plan section that documents the default `~/.copilot/skills/` target, the tool-specific roots, and the `--target` override rule that will guide subsequent edits.
+- [x] Task 2 — Update installer default destination behavior in `install.js`: Default target and usage text now reference `~/.copilot/skills/` while `--tool` handling for Copilot, Codex, and Antigravity remains intact.
+- [x] Task 3 — Update installer parity in `install.sh`: The shell wrapper comments now point operators at the Copilot default destination so both installers share the same policy.
+- [x] Task 4 — Align operator docs for install destinations: README and `skills/rpi-workflow/SKILL.md` describe the Copilot default root and the supported tool-specific behaviors.
+- [x] Task 5 — Make project-id slug convention explicit: README and SKILL explain the `yyyymmdd-slug` naming pattern that `rpi-new.sh` derives from the project title.
+- [x] Task 6 — Perform manual end-to-end consistency check: Ran `node install.js --dry-run` and `bash install.sh --dry-run`, both reporting `/Users/seibeliv/.copilot/skills` as the planned target.
+
+## Safe State Achieved
+Installer output, README guidance, and the workflow router instructions all reference the `~/.copilot/skills/` default root and the documented slug pattern, so running the documented bootstrap/install commands now produces outputs that match the policy described in Section 1.
+
+## Notes
+Manual dry-run installers completed without copying files; no additional follow-up required.

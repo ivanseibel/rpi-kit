@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # rpi-kit installer wrapper
+# Default destination: ~/.copilot/skills (Copilot-compatible)
 # Delegates to install.js — requires Node.js
 
 if ! command -v node &>/dev/null; then
