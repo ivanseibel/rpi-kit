@@ -4,7 +4,7 @@ Artifacts installed by `node install.js` (or `bash install.sh`).
 
 ## Destination
 
-Default: `~/.agents/skills/`  
+Default: `~/.copilot/skills/`  
 By tool (`--tool <name>`):
 - `copilot` → `~/.copilot/skills/`
 - `codex` → `~/.agents/skills/`
@@ -27,8 +27,8 @@ Override: `--target <path>` (cannot be combined with `--tool`)
 | `skills/rpi-workflow/scripts/rpi-new.sh`              | `<skills-root>/rpi-workflow/scripts/rpi-new.sh`              |
 
 `<skills-root>` is one of:
-- `~/.agents/skills/` (default or `--tool codex`)
-- `~/.copilot/skills/` (`--tool copilot`)
+- `~/.copilot/skills/` (default or `--tool copilot`)
+- `~/.agents/skills/` (`--tool codex`)
 - `~/.gemini/antigravity/skills/` (`--tool antigravity`)
 
 ## Per-Project Artifacts (created at runtime by the skill)
@@ -39,6 +39,6 @@ These are **not** installed by the installer. They are created by the `rpi-workf
 | -------------------------------- | ------------------------------------------------------------- |
 | `.rpi/AGENTS.md`                 | Copied from `resources/agents-md-template.md`                 |
 | `.rpi/projects/.gitkeep`         | Created empty                                                 |
-| `.rpi/projects/<id>/research.md` | Created by `rpi-new.sh` from `resources/research-template.md` |
-| `.rpi/projects/<id>/plan.md`     | Created during Plan phase from `resources/plan-template.md`   |
-| `.rpi/projects/<id>/SIGNOFF`     | Created at end of Implement phase                             |
+| `.rpi/projects/<yyyymmdd-slug>/research.md` | Created by `rpi-new.sh` from `resources/research-template.md` |
+| `.rpi/projects/<yyyymmdd-slug>/plan.md`     | Created during Plan phase from `resources/plan-template.md`   |
+| `.rpi/projects/<yyyymmdd-slug>/SIGNOFF`     | Created at end of Implement phase                             |

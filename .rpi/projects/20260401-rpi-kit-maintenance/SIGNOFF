@@ -1,15 +1,16 @@
 # SIGNOFF — 20260401-rpi-kit-maintenance
 
 ## Completed Tasks
-- [x] Task 1 — Define install destination policy baseline: Added a plan section that documents the default `~/.copilot/skills/` target, the tool-specific roots, and the `--target` override rule that will guide subsequent edits.
-- [x] Task 2 — Update installer default destination behavior in `install.js`: Default target and usage text now reference `~/.copilot/skills/` while `--tool` handling for Copilot, Codex, and Antigravity remains intact.
-- [x] Task 3 — Update installer parity in `install.sh`: The shell wrapper comments now point operators at the Copilot default destination so both installers share the same policy.
-- [x] Task 4 — Align operator docs for install destinations: README and `skills/rpi-workflow/SKILL.md` describe the Copilot default root and the supported tool-specific behaviors.
-- [x] Task 5 — Make project-id slug convention explicit: README and SKILL explain the `yyyymmdd-slug` naming pattern that `rpi-new.sh` derives from the project title.
-- [x] Task 6 — Perform manual end-to-end consistency check: Ran `node install.js --dry-run` and `bash install.sh --dry-run`, both reporting `/Users/seibeliv/.copilot/skills` as the planned target.
+- [x] Task 1 — Confirm authoritative destination mapping: Verified installer mapping via `node install.js --dry-run` and tool-specific dry-runs (`copilot` -> `~/.copilot/skills/`, `codex` -> `~/.agents/skills/`, `antigravity` -> `~/.gemini/antigravity/skills/`), with governance alignment in `AGENTS.md` and skill install guidance.
+- [x] Task 2 — Audit repository for stale Copilot/default path language: Text audit identified stale Copilot/default language in `INVENTORY.md` and `skills/rpi-workflow/resources/agents-md-template.md` (and derived `.rpi/AGENTS.md` before sync).
+- [x] Task 3 — Align install-path wording in affected docs and templates: Updated in-scope mismatches so Copilot/default wording matches installer behavior in `INVENTORY.md`, `skills/rpi-workflow/resources/agents-md-template.md`, and synced `.rpi/AGENTS.md` from template.
+- [x] Task 4 — Synchronize inventory statements with current install behavior: Updated `INVENTORY.md` default and `<skills-root>` mapping; cross-checked against dry-run output and installer semantics.
+- [x] Task 5 — Resolve project-id convention ambiguity in docs: Clarified inventory per-project artifact paths from `<id>` to `<yyyymmdd-slug>`, matching `skills/rpi-workflow/scripts/rpi-new.sh` slug generation and date prefix behavior.
+- [x] Task 6 — Execute consistency validation checks: Ran `node install.js --dry-run` (default and each `--tool`), validated `--target` override behavior and prohibition against `--tool`+`--target`, and performed targeted text searches showing no stale Copilot/default contradictions in in-scope docs/templates.
 
 ## Safe State Achieved
-Installer output, README guidance, and the workflow router instructions all reference the `~/.copilot/skills/` default root and the documented slug pattern, so running the documented bootstrap/install commands now produces outputs that match the policy described in Section 1.
+Copilot/default path language is now consistent with installer behavior across installer docs, governance docs, and workflow templates. Project-id naming language now reflects the date-prefixed slug convention used by the scaffolder. Installer dry-run output matches published inventory and guidance for default, tool-resolved, and `--target` override semantics.
 
 ## Notes
-Manual dry-run installers completed without copying files; no additional follow-up required.
+- `.rpi/AGENTS.md` was synchronized from `skills/rpi-workflow/resources/agents-md-template.md` to align bootstrap governance content with the current template.
+- Validation focused on in-scope documentation/template surfaces defined in `plan.md`; historical project research/plan artifacts were not rewritten.

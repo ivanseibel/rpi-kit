@@ -1,0 +1,25 @@
+# SIGNOFF — 20260401-rpi-kit-workflow-enhancements
+
+## Completed Tasks
+
+- [x] Task 1 — Add version marker to agents-md-template.md: PASS — `head -1 skills/rpi-workflow/resources/agents-md-template.md` returns `<!-- rpi-agents-version: 1.1 -->` as the first line of the file.
+- [x] Task 2 — Update Implementer row in agents-md-template.md: PASS — `grep -A5 "Implementer" skills/rpi-workflow/resources/agents-md-template.md` confirms both "Must follow `plan.md` strictly" and "named-only partial execution" are present in the same Implementer row cell.
+- [x] Task 3 — Extend SKILL.md Bootstrap section for version-aware refresh: PASS — Bootstrap section in `skills/rpi-workflow/SKILL.md` contains all five required elements: (a) absent-file creation path, (b) version token comparison logic, (c) silent overwrite path with report "Updated `.rpi/AGENTS.md` to version 1.1.", (d) version-match silent-continue path, (e) `.gitkeep` creation step.
+- [x] Task 4 — Rewrite stages/implement.md Objective section: PASS — Objective section in `skills/rpi-workflow/stages/implement.md` contains both the default sequential mandate ("Execute every task in `plan.md` sequentially") and the named-only partial execution exception clause ("Exception: if the operator explicitly names a subset of tasks…").
+- [x] Task 5 — Scope the FORBIDDEN "Skipping tasks" entry in stages/implement.md: PASS — FORBIDDEN Actions bullet now reads "Skipping tasks without explicit operator authorisation" with a two-branch clause; unqualified blanket prohibition removed.
+
+## Safe State Achieved
+
+All five safe state conditions from plan.md Section 1 are met:
+
+1. `skills/rpi-workflow/resources/agents-md-template.md` first line is `<!-- rpi-agents-version: 1.1 -->` — confirmed via `head -1`.
+2. `skills/rpi-workflow/SKILL.md` Bootstrap section covers all four sub-conditions: absent-file creation, version comparison, silent overwrite + report, and version-match silent continue — confirmed by reading the section.
+3. `skills/rpi-workflow/stages/implement.md` Objective section now expresses the named-only partial execution model alongside the sequential default — confirmed by reading the section.
+4. `skills/rpi-workflow/stages/implement.md` FORBIDDEN Actions "Skipping tasks" entry is scoped to "without explicit operator authorisation" — confirmed by `grep`.
+5. `skills/rpi-workflow/resources/agents-md-template.md` Implementer row acknowledges named-only partial execution as a sanctioned operator-gate capability — confirmed by `grep -A5 "Implementer"`.
+
+## Notes
+
+- No installer changes were required or made. `INVENTORY.md` is unchanged (no new files created).
+- The end-to-end smoke test (loading SKILL.md against a project with a version-less `.rpi/AGENTS.md`) is a manual operator step and was not executed in this session, as it requires a live agent session in a target project.
+- The `⛔ END OF PLAN PHASE` comment in `plan.md` was intentionally left in place — it is a phase boundary marker from the Plan phase and is not removed by the Implement phase.

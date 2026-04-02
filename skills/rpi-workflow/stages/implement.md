@@ -23,14 +23,14 @@ This declaration anchors the phase constraint for the rest of the session.
 
 ## Objective
 
-Execute every task in `plan.md` sequentially, verify each one, and produce a `SIGNOFF` file when all tasks are complete.
+Execute every task in `plan.md` sequentially, verify each one, and produce a `SIGNOFF` file when all tasks are complete. Exception: if the operator explicitly names a subset of tasks for this session (e.g., "execute only Task 2 and Task 4"), execute exactly those named tasks in their plan.md order and stop. Do not execute any task not named by the operator in partial-execution mode.
 
 ## ⛔ FORBIDDEN Actions
 
 The following actions are **critical phase violations**. If you catch yourself doing any of these, STOP immediately and notify the operator:
 
 - ⛔ **Adding tasks not in `plan.md`** — scope creep is a violation
-- ⛔ **Skipping tasks** or reinterpreting their meaning
+- ⛔ **Skipping tasks without explicit operator authorisation** — if the operator has not named this task for the current partial-execution session, do not execute it; if the operator has given no partial-execution instruction, all tasks must be executed.
 - ⛔ **Modifying files outside the scope** defined by `plan.md` tasks
 - ⛔ **Running formatters/linters on files outside scope** (e.g., auto-formatting unrelated files)
 - ⛔ **Marking a task complete without verification** — run the pass/fail check first

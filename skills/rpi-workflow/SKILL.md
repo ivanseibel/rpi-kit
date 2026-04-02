@@ -38,9 +38,10 @@ Run `bash install.sh` or `node install.js` to install the skills. Without `--too
 
 Before any phase work, ensure the repository has RPI governance:
 
-1. If `.rpi/AGENTS.md` is absent → create it from `resources/agents-md-template.md`.
-2. If `.rpi/projects/` is absent → create `.rpi/projects/.gitkeep`.
-3. Report what was created. If both exist, continue silently.
+1. If `.rpi/AGENTS.md` is absent → create it from `resources/agents-md-template.md` and report "Created `.rpi/AGENTS.md`."
+2. If `.rpi/AGENTS.md` is present → read its first line and compare the `rpi-agents-version` token against the first line of `resources/agents-md-template.md`. If the installed version token is missing or lower than the template version, silently overwrite `.rpi/AGENTS.md` with the current template content and report "Updated `.rpi/AGENTS.md` to version 1.1." If versions match, continue silently.
+3. If `.rpi/projects/` is absent → create `.rpi/projects/.gitkeep`.
+4. Report what was created or updated. If all files exist and versions match, continue silently.
 
 These are the only files the skill may create outside normal phase rules.
 
