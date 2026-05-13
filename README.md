@@ -101,6 +101,7 @@ rpi-kit/
 
 ## Key Files
 
+- [→ Full Developer Guide](docs/developer-guide.md)
 - [skills/rpi-workflow/SKILL.md](skills/rpi-workflow/SKILL.md) — skill entry point (lightweight router)
 - [skills/rpi-workflow/stages/](skills/rpi-workflow/stages/) — phase instructions (loaded one at a time)
 - [skills/rpi-workflow/resources/agents-md-template.md](skills/rpi-workflow/resources/agents-md-template.md) — governance template

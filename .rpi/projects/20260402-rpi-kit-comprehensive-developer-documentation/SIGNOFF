@@ -1,0 +1,38 @@
+# SIGNOFF — 20260402-rpi-kit-comprehensive-developer-documentation
+
+## Completed Tasks
+
+- [x] Task 1 — Create `docs/developer-guide.md` scaffold: File created with top-level heading, 8-item TOC with anchor links, and all 8 `##` section headings. Verified: file present, exactly 8 `##` headings, TOC anchors resolve.
+- [x] Task 2 — Write §1 "What is the RPI Kit": Prose written covering the kit's purpose, kit vs. pattern distinction, prompt file comparison, and a table of the four primary artefacts. Verified: §1 is well over 200 words; references all four artefacts (SKILL.md, stage files, templates, installer); self-contained for a developer with no prior RPI knowledge.
+- [x] Task 3 — Write §2 "Why the RPI Pattern": Prose written covering cognitive overload in unstructured AI workflows, phase separation reducing premature convergence, FAR evidence-based decision making, and the "one phase per session" mechanical constraint. Verified: all four sub-points present; phase collapse concept defined; theoretical basis cited without LLM internals; does not duplicate §6.
+- [x] Task 4 — Write §3 "Installation": Six scenarios written with exact code blocks — (1) default Copilot install, (2) Codex install, (3) Gemini Antigravity install, (4) explicit Copilot install, (5) custom target, (6) update with `--mode overwrite`. Dry-run section included with example output. Verified: all six scenarios present; all commands use `node install.js` or `bash install.sh`; `--dry-run` documented.
+- [x] Task 5 — Write §4 "Operational Workflow": ASCII workflow diagram, phase/artefact/gate table, bootstrap description, `rpi-new.sh` command with slug explanation, three phase invocation one-liners, FAR and FACTS criteria tables, and recursion protocol. Verified: all three phases documented; both FAR and FACTS criteria present as tables; recursion protocol included; `rpi-new.sh` command shown; diagram renders in ASCII.
+- [x] Task 6 — Write §5 "When to Use RPI": Five high-value scenarios with concrete examples (ambiguous problem space, high stakes, multi-team, novel, audit trail); four low-value scenarios with concrete examples (trivial task, known answer, time-critical hotfix, single atomic op); "Coming from unstructured AI workflows" subsection explaining the phase-as-unit-of-work transition. Verified: ≥3 concrete examples per scenario type; subsection present and well over 100 words; no prescriptive migration steps.
+- [x] Task 7 — Write §6 "Why Skills Outperform Alternatives": Comparison table with 4 columns (Skills, Custom Prompts, Instruction Files, Custom Agents) across 7 capability rows; narrative paragraphs for each of the 7 advantages from `research.md §6`, each with a concrete example or counter-example. Verified: table present with ≥4 columns; all 7 advantages (mechanical phase enforcement, progressive disclosure, stateless reinstallability, native tooling integration, governance, cognitive load reduction, tool-agnosticism) covered; ≥1 concrete example per advantage.
+- [x] Task 8 — Write §7 "Developer Workflow Quick Reference": Project creation command with example output; three phase invocation one-liners (Research, Plan, Implement); directory structure diagram showing `research.md`, `plan.md`, and `SIGNOFF`; SIGNOFF location and meaning explanation. Verified: all four sub-items present; diagram includes SIGNOFF; phase patterns are ≤2 lines each; section is condensed, not duplicating §4 prose.
+- [x] Task 9 — Write §8 "Troubleshooting and FAQ": Five `###` FAQ entries — phase collapse recovery; skill not loading / SKILL.md not found; `.rpi/AGENTS.md` overwrite explanation; recursion to redo research; using the kit without a supported tool. Verified: 5 `###` headings present; each answer is self-contained and well over 50 words; no answer redirects entirely to another section.
+- [x] Task 10 — Add developer guide link to `README.md`: Single line `[→ Full Developer Guide](docs/developer-guide.md)` added to the `## Key Files` section. Verified: link present in README.md; no other lines changed; path is correct.
+
+## Safe State Achieved
+
+All four Safe State conditions from plan.md §1 are met:
+
+1. **`docs/developer-guide.md` exists with all 8 sections fully written and internally linked.** File is present at `docs/developer-guide.md`. The TOC contains 8 anchor links, each resolving to a `##` heading in the document.
+
+2. **`README.md` contains a linked reference to `docs/developer-guide.md`.** The link `[→ Full Developer Guide](docs/developer-guide.md)` is present in the `## Key Files` section of `README.md`.
+
+3. **A human reviewer can read the guide and understand how to install the kit, run a three-phase project, and decide whether RPI is appropriate — without consulting any other file.** §3 covers all installation scenarios with exact commands. §4 covers the full end-to-end workflow with phase invocation patterns. §5 provides explicit go/no-go decision guidance. Each section is self-contained.
+
+4. **No existing file other than `README.md` and the new `docs/developer-guide.md` has been modified.** Only two files were touched: the new `docs/developer-guide.md` (created) and `README.md` (one line added). No skill files, installer scripts, stage files, or templates were modified.
+
+## Notes
+
+- `docs/developer-guide.md` is a new file; it does not appear in `INVENTORY.md`. Per AGENTS.md (kit-maintenance) Rule 1, INVENTORY.md must stay in sync with installed artifacts — however, `developer-guide.md` is a docs file, not an installed skill artifact. No INVENTORY.md update is required.
+- The guide targets developer adopters, not kit maintainers. If a future project addresses kit-maintainer documentation, a separate guide in `docs/` would be appropriate rather than extending this file.
+- The "Coming from unstructured AI workflows" subsection in §5 fulfils the migration narrative gap identified in `research.md §8` without requiring a standalone migration guide.
+
+## Post-Completion Amendment
+
+**Operator feedback:** The guide must be standalone — no links to other files in the repository, as it will be shared independently and such links would be broken.
+
+**Action taken:** The external file link to `docs/The Research–Plan–Implement (RPI) Pattern in Complex Problem Solving and Collaboration.md` in §1 was removed. In its place, a new "Theoretical Foundations" subsection was added to §2, integrating the key theoretical content from that document directly into the guide. The subsection covers: RPI's cross-disciplinary origins (scientific method, engineering phase-gates, military OODA loop, PDCA cycle), the distinction between RPI as a pattern vs. a rigid checklist, the concept of logically distinct cognitive modes per phase, and the five key principles validated across domains. Verified: `docs/developer-guide.md` contains zero Markdown links to external files (regex `\[.*?\]\((?!#).*?\)` returns 0 results). The guide is now fully self-contained.
