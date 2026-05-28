@@ -49,18 +49,6 @@ The first time the skill is invoked in a repository, it automatically creates:
 - `.rpi/AGENTS.md` — governance roles and handoff rules
 - `.rpi/projects/.gitkeep` — project artifacts directory
 
-### New Project
-
-```bash
-# New projects use the Copilot-planned skills root by default.
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-# or
-bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-# Creates .rpi/projects/yyyymmdd-slug/research.md
-
-Project directories follow a `yyyymmdd-slug` naming pattern that `rpi-new.sh` derives from the title by lowercasing it, replacing non-alphanumeric characters with hyphens, collapsing repeated hyphens, and trimming edge hyphenation.
-```
-
 ## What Gets Installed
 
 | Skill          | Description                                                                 |

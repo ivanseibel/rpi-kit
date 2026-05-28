@@ -53,20 +53,9 @@ These are the only files the skill may create outside normal phase rules.
 - **Recurse on blockers.** If a phase hits an unresolvable issue, stop and return to the prior phase.
 - **Never reuse project folders silently.** Scan `.rpi/projects/` for existing slugs; if found, stop and ask the operator before proceeding.
 
-## Scaffolding Script
+## Project Scaffolding
 
-Create a new project directory:
-
-```bash
-# New projects reference the Copilot skills root by default.
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-# or
-bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "Project Title"
-```
-
-Creates `.rpi/projects/yyyymmdd-slug/research.md` from the research template.
-
-Project directories follow the `yyyymmdd-slug` pattern that the scaffolder builds from the title: it lowercases characters, replaces non-alphanumeric characters with hyphens, collapses repeated hyphen runs, and trims leading/trailing hyphenation.
+Before starting the Research phase, the agent automatically creates the project directory by running `rpi-new.sh` with the project title provided by the operator. Project directories follow the `yyyymmdd-slug` pattern derived from the title: lowercased, non-alphanumeric characters replaced with hyphens, repeated hyphens collapsed, leading/trailing hyphens trimmed.
 
 ## Resources
 

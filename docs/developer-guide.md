@@ -227,20 +227,6 @@ When the `rpi-workflow` skill is first invoked in a repository, it bootstraps th
 
 On subsequent invocations, the skill checks the version token in `.rpi/AGENTS.md` against the installed template. If the installed version is outdated, it silently overwrites the file with the current template and reports the update.
 
-### Creating a new project
-
-Use the `rpi-new.sh` scaffolding script to create a project directory and initialise `research.md` from the shared template:
-
-```bash
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "My Project Title"
-# or for Gemini:
-bash ~/.gemini/antigravity/skills/rpi-workflow/scripts/rpi-new.sh "My Project Title"
-```
-
-This creates: `.rpi/projects/yyyymmdd-my-project-title/research.md`
-
-The directory slug is derived from the title: lowercased, non-alphanumeric characters replaced with hyphens, repeated hyphens collapsed, leading/trailing hyphens trimmed.
-
 ### Invoking each phase
 
 Each phase is invoked by referencing the `rpi-workflow` skill in your agent session and stating the phase you are entering. The skill's routing logic loads only the corresponding stage file.
@@ -392,20 +378,6 @@ The `rpi-workflow` skill uses no tool-specific APIs, annotations, or syntax. It 
 ## 7. Developer Workflow Quick Reference
 
 A condensed cheatsheet for day-to-day use. Assumes you have read §3 (Installation) and §4 (Operational Workflow).
-
-### Project creation
-
-```bash
-bash ~/.copilot/skills/rpi-workflow/scripts/rpi-new.sh "Your Project Title"
-```
-
-Example output:
-
-```
-Created: .rpi/projects/20240415-your-project-title/research.md
-```
-
-The script derives the slug from the title: lowercase, hyphens for non-alphanumeric characters, collapsed repeated hyphens, trimmed edges.
 
 ### Phase invocation (one-liner per phase)
 

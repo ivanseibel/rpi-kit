@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPI Kit — Research → Plan → Implement</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0f1117;
+    --surface:  #1a1d27;
+    --border:   #2a2d3a;
+    --text:     #e8eaf0;
+    --muted:    #6b7280;
+    --accent:   #7c6af7;
+    --accent2:  #4fa3e0;
+    --accent3:  #4ade80;
+    --warn:     #f59e0b;
+    --r:        #f87171;
+    --p:        #c084fc;
+    --i:        #4ade80;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── Deck ── */
+  .deck {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity .35s ease, transform .35s ease;
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+  .slide.out {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* ── Nav ── */
+  .nav {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+  }
+  .nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background .2s, border-color .2s;
+  }
+  .nav button:hover { background: var(--border); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .counter {
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .dots {
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background .2s, transform .2s;
+    cursor: pointer;
+  }
+  .dot.active {
+    background: var(--accent);
+    transform: scale(1.4);
+  }
+
+  /* ── Typography ── */
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(2.8rem, 6vw, 4.6rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    text-align: center;
+  }
+  h2 {
+    font-size: clamp(2.1rem, 4.2vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .sub {
+    font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+    color: var(--muted);
+    text-align: center;
+    max-width: 640px;
+    line-height: 1.7;
+    margin-top: 20px;
+  }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* ── Cards ── */
+  .cards {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    width: 240px;
+    flex-shrink: 0;
+  }
+  .card .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .card h3 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .card p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Phase colors */
+  .r .label, .r h3 { color: var(--r); }
+  .r { border-color: rgba(248,113,113,.25); }
+  .p .label, .p h3 { color: var(--p); }
+  .p { border-color: rgba(192,132,252,.25); }
+  .i .label, .i h3 { color: var(--i); }
+  .i { border-color: rgba(74,222,128,.25); }
+
+  /* ── Code-like block ── */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 28px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-top: 24px;
+    max-width: 640px;
+    width: 100%;
+  }
+  .code-block .hl { color: var(--text); }
+  .code-block .c  { color: var(--accent2); }
+  .code-block .v  { color: var(--accent3); }
+
+  /* ── Problem slide ── */
+  .problem-list {
+    list-style: none;
+    max-width: 640px;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .problem-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 1.25rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .problem-list li:last-child { border-bottom: none; }
+  .problem-list .icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Arrow flow ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .flow-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .flow-badge {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    padding: 8px 20px;
+    border-radius: 8px;
+  }
+  .flow-badge.r { background: rgba(248,113,113,.15); color: var(--r); }
+  .flow-badge.p { background: rgba(192,132,252,.15); color: var(--p); }
+  .flow-badge.i { background: rgba(74,222,128,.15);  color: var(--i); }
+  .flow-note {
+    font-size: .9rem;
+    color: var(--muted);
+    text-align: center;
+    max-width: 120px;
+  }
+  .arrow { color: var(--border); font-size: 1.4rem; margin-bottom: 22px; }
+
+  /* ── Validation table ── */
+  .vtable {
+    border-collapse: collapse;
+    margin-top: 28px;
+    max-width: 680px;
+    width: 100%;
+    font-size: 1.1rem;
+  }
+  .vtable th {
+    text-align: left;
+    padding: 10px 18px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: .9rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .vtable td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .vtable td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .vtable tr:last-child td { border-bottom: none; }
+  .badge-r { color: var(--r); } .badge-p { color: var(--p); } .badge-i { color: var(--i); }
+
+  /* ── Kit slide ── */
+  .kit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 720px;
+    width: 100%;
+    margin-top: 24px;
+  }
+  .kit-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .kit-item .kit-label {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 1rem;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+  .kit-item p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Title slide accent ── */
+  .title-accent {
+    display: flex;
+    gap: 14px;
+    margin-top: 36px;
+    justify-content: center;
+  }
+  .pill {
+    padding: 7px 22px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .pill.r { background: rgba(248,113,113,.12); color: var(--r); }
+  .pill.p { background: rgba(192,132,252,.12); color: var(--p); }
+  .pill.i { background: rgba(74,222,128,.12);  color: var(--i); }
+
+  /* ── Closing slide ── */
+  .cmd {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 28px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 1.1rem;
+    color: var(--accent3);
+    margin-top: 32px;
+  }
+  .cmd span { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. Title -->
+  <section class="slide active" id="s0">
+    <div class="eyebrow">Introducing</div>
+    <h1>Research → Plan → Implement</h1>
+    <p class="sub">A three-phase workflow that turns AI-assisted development from <strong>a guessing game</strong> into a <strong>repeatable process</strong>.</p>
+    <div class="title-accent">
+      <span class="pill r">Research</span>
+      <span class="pill p">Plan</span>
+      <span class="pill i">Implement</span>
+    </div>
+  </section>
+
+  <!-- 2. The problem -->
+  <section class="slide" id="s1">
+    <h2>The problem with "just ask the AI"</h2>
+    <ul class="problem-list">
+      <li>
+        <span class="icon">🎲</span>
+        <span>The agent jumps straight to code — skipping the thinking that makes the code correct.</span>
+      </li>
+      <li>
+        <span class="icon">🔄</span>
+        <span>Feedback loops are expensive: wrong decisions surface late, when changing them is hardest.</span>
+      </li>
+      <li>
+        <span class="icon">📭</span>
+        <span>Nobody knows <em>why</em> a decision was made — not the agent, not the developer.</span>
+      </li>
+      <li>
+        <span class="icon">💥</span>
+        <span>Each new session starts from scratch. Context collapses. Work gets repeated.</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 3. The insight -->
+  <section class="slide" id="s2">
+    <div class="eyebrow">The core insight</div>
+    <h2>Each phase needs a different cognitive mode</h2>
+    <div class="flow">
+      <div class="flow-item">
+        <span class="flow-badge r">Research</span>
+        <span class="flow-note">Divergent — explore, question, gather facts</span>
+      </div>
+      <span class="arrow">→</span>
+      <div class="flow-item">
+        <span class="flow-badge p">Plan</span>
+        <span class="flow-note">Convergent — evaluate, decide, commit</span>
+      </div>
+      <span class="arrow">→</span>
+      <div class="flow-item">
+        <span class="flow-badge i">Implement</span>
+        <span class="flow-note">Procedural — execute, verify, deliver</span>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:32px">Mixing these modes in a single prompt — <strong>phase collapse</strong> — is the root cause of most AI-assisted development failures.</p>
+  </section>
+
+  <!-- 4. Research phase -->
+  <section class="slide" id="s3">
+    <div class="eyebrow" style="color:var(--r)">Phase 1</div>
+    <h2 style="color:var(--r)">Research</h2>
+    <p class="sub">Before writing a single line of code, the agent reads the codebase and maps all unknowns. The operator then decides which to resolve — and whether to answer them directly or let the Plan phase address them.</p>
+    <div class="code-block">
+      <span class="hl">Artifact: </span><span class="v">research.md</span><br>
+      <span class="hl">Criterion: </span><span class="c">FAR</span> — Factual · Actionable · Relevant<br><br>
+      <span class="hl">Exit gate: </span>every open question has a cited, factual answer<br>
+      <span class="hl">Anti-pattern: </span>collecting opinions instead of facts
+    </div>
+  </section>
+
+  <!-- 5. Plan phase -->
+  <section class="slide" id="s4">
+    <div class="eyebrow" style="color:var(--p)">Phase 2</div>
+    <h2 style="color:var(--p)">Plan</h2>
+    <p class="sub">Research findings drive a task list where <strong>every task is independently testable</strong>. No task may be added that isn't grounded in the research.</p>
+    <div class="code-block">
+      <span class="hl">Artifact: </span><span class="v">plan.md</span><br>
+      <span class="hl">Criterion: </span><span class="c">FACTS</span> — Feasible · Atomic · Clear · Testable · Scoped<br><br>
+      <span class="hl">Exit gate: </span>each task has a pass/fail acceptance criterion<br>
+      <span class="hl">Anti-pattern: </span>a plan that is documentation theater
+    </div>
+  </section>
+
+  <!-- 6. Implement phase -->
+  <section class="slide" id="s5">
+    <div class="eyebrow" style="color:var(--i)">Phase 3</div>
+    <h2 style="color:var(--i)">Implement</h2>
+    <p class="sub">The agent executes <strong>only what the plan prescribes</strong>, marks each task pass or fail, and produces a signed-off record of what was built.</p>
+    <div class="code-block">
+      <span class="hl">Artifact: </span><span class="v">source code</span> + <span class="v">SIGNOFF</span><br>
+      <span class="hl">Criterion: </span>each task from plan.md resolves to pass or fail<br><br>
+      <span class="hl">Exit gate: </span>all tasks resolved; SIGNOFF written<br>
+      <span class="hl">Anti-pattern: </span>scope creep, undocumented deviations
+    </div>
+  </section>
+
+  <!-- 7. The rule -->
+  <section class="slide" id="s6">
+    <div class="eyebrow">The cardinal rule</div>
+    <h2>One phase per session. Always.</h2>
+    <table class="vtable">
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Artifact</th>
+          <th>Validation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="badge-r">Research</td>
+          <td>research.md</td>
+          <td>FAR — every answer is a citable fact</td>
+        </tr>
+        <tr>
+          <td class="badge-p">Plan</td>
+          <td>plan.md</td>
+          <td>FACTS — every task is atomic and testable</td>
+        </tr>
+        <tr>
+          <td class="badge-i">Implement</td>
+          <td>code + SIGNOFF</td>
+          <td>Each task resolves to pass or fail</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:24px; font-size:.95rem">The operator — not the agent — decides when to move to the next phase.</p>
+  </section>
+
+  <!-- 8. RPI Kit -->
+  <section class="slide" id="s7">
+    <div class="eyebrow">Meet the toolkit</div>
+    <h2>RPI Kit</h2>
+    <p class="sub" style="margin-top:0; margin-bottom:8px">A single installable skill that enforces the RPI workflow in <strong>any AI agent</strong> — Copilot, Claude, Gemini, Cursor, Codex.</p>
+    <div class="kit-grid">
+      <div class="kit-item">
+        <div class="kit-label">SKILL.md</div>
+        <p>Lightweight router — loads only the instructions for the active phase. No token waste on inactive stages.</p>
+      </div>
+      <div class="kit-item">
+        <div class="kit-label">stages/</div>
+        <p>Three self-contained files, one per phase. Each is the complete, authoritative guide for that phase.</p>
+      </div>
+      <div class="kit-item">
+        <div class="kit-label">resources/</div>
+        <p>Templates for research.md and plan.md. Validation guide with FAR and FACTS criteria.</p>
+      </div>
+      <div class="kit-item">
+        <div class="kit-label">rpi-new.sh</div>
+        <p>Scaffolds a new project folder with today's date and a slug. Copies the research template to get started.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. How to use -->
+  <section class="slide" id="s8">
+    <div class="eyebrow">Getting started</div>
+    <h2>Two commands, any agent</h2>
+    <div class="code-block" style="max-width:600px">
+      <span class="c"># 1. Install the skill once</span><br>
+      <span class="hl">bash </span><span class="v">install.sh</span><br><br>
+      <span class="c"># 2. Tell your agent which phase to run</span><br>
+      <span class="hl">@rpi-workflow</span> <span class="v">Research</span> <span class="c">"My Feature"</span>
+    </div>
+    <p class="sub" style="font-size:.95rem">The agent scaffolds the project folder automatically, then reads the stage file, produces the artifact, and <strong>stops</strong>. You review, then call the next phase when ready.</p>
+  </section>
+
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <button id="prev" disabled>← Prev</button>
+  <span class="counter" id="counter">1 / 9</span>
+  <button id="next">Next →</button>
+</nav>
+
+<div class="dots" id="dots"></div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  let   cur    = 0;
+
+  const prevBtn  = document.getElementById('prev');
+  const nextBtn  = document.getElementById('next');
+  const counter  = document.getElementById('counter');
+  const dotsEl   = document.getElementById('dots');
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('out');
+    setTimeout(() => slides[cur].classList.remove('out'), 350);
+
+    cur = n;
+    slides[cur].classList.add('active');
+
+    dotsEl.querySelectorAll('.dot').forEach((d, i) =>
+      d.classList.toggle('active', i === cur)
+    );
+
+    counter.textContent = `${cur + 1} / ${total}`;
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === total - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(cur - 1));
+  nextBtn.addEventListener('click', () => goTo(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(cur - 1);
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) dx < 0 ? goTo(cur + 1) : goTo(cur - 1);
+  });
+</script>
+</body>
+</html>
